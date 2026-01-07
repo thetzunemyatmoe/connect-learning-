@@ -38,3 +38,22 @@ export async function syncUser() {
       console.log("Error in syncUser", error)
   }
 }
+
+export async function geUserByClerkId(clerkId:string) {
+
+  return prisma.user.findUnique({
+    where: {
+      clerkId: clerkId
+    },
+    include:{
+      _count:{
+        select:{
+          followers:true,
+          followings:true,
+          posts:true
+        }
+      }
+    }
+  })
+  
+}

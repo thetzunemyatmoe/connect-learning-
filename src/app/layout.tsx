@@ -5,6 +5,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "@/components/ThemeProvier";
 import NavBar from "@/components/NavBar";
 import Sidebar from "@/components/Sidebar";
+import { Toaster } from "react-hot-toast"
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -59,9 +60,10 @@ export default function RootLayout({
                 </div>
                 
               </main>
-            </div>
-            
+              </div>
+              <Toaster/>
           </ThemeProvider>
+
       
       </body>
     </html>

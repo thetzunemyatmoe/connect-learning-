@@ -57,3 +57,16 @@ export async function geUserByClerkId(clerkId:string) {
   })
   
 }
+
+export async function gerDbUserId() {
+  const { userId:clerkId } = await auth();
+
+  if (!clerkId) throw new Error("Unauthorized");
+
+  const user = await geUserByClerkId(clerkId);
+
+  if (!user) throw new Error("User not found");
+
+  return user.id;
+  
+}

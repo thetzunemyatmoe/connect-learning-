@@ -39,7 +39,7 @@ export async function syncUser() {
   }
 }
 
-export async function geUserByClerkId(clerkId:string) {
+export async function getUserByClerkId(clerkId:string) {
 
   return prisma.user.findUnique({
     where: {
@@ -58,16 +58,61 @@ export async function geUserByClerkId(clerkId:string) {
   
 }
 
-export async function gerDbUserId() {
+export async function getDbUserId() {
   const { userId:clerkId } = await auth();
 
   if (!clerkId) throw new Error("Unauthorized");
 
-  const user = await geUserByClerkId(clerkId);
+  const user = await getUserByClerkId(clerkId);
 
   if (!user) throw new Error("User not found");
 
   return user.id;
   
+}
+
+export async function getRandomUsers() {
+  try {
+    const userId = await getDbUserId()
+
+    // GET THREE RANDOM USERS (EXCLUDE OURSELF and ALREADY FOLLOWED USERS)
+
+    const randomUsers = await prisma.user.findMany({
+      where: {
+        AND: [
+          // {
+          //   NOT: { id: userId }
+          // },
+          {
+            NOT: {
+              followers: {
+                some: {
+                  followerId: userId
+                }
+              }
+            }
+          }
+        ]
+      }, 
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        image: true,
+        _count: {
+          select: {
+            followers: true,
+            followings: true
+          }
+        }
+      },
+      take: 3
+    })
+
+    return randomUsers;
+  } catch (errror) {
+    console.log("Error fetching random users", errror);
+    return []
+  }
 }
 

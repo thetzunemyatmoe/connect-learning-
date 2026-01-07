@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { auth, currentUser, EmailAddress } from "@clerk/nextjs/server";
+import { error } from "console";
 
 export async function syncUser() {
   try {
@@ -116,3 +117,77 @@ export async function getRandomUsers() {
   }
 }
 
+
+export async function toggleFollow(targetUserId: string) {
+
+
+  try {
+    const userId = await getDbUserId();
+
+    console.log("hello")
+    console.log(userId)
+    console.log(targetUserId)
+
+    if (userId === targetUserId) {
+      return {
+        success: false,
+        error: "You cannot follow yourself"
+      }
+    }
+
+    console.log("this is reached")
+
+    const existingFollow = await prisma.follows.findUnique({
+      where: {
+        followerId_followingId : {
+          followerId: userId,
+          followingId: targetUserId
+        }
+      }
+    })
+
+    if (existingFollow) {
+        await prisma.follows.delete({
+          where: {
+            followerId_followingId: {
+              followerId: userId,
+              followingId: targetUserId
+            }
+          }
+        })
+      } else {
+        await prisma.$transaction(
+          [
+            prisma.follows.create(
+              {
+                data: {
+                  followerId: userId,
+                  followingId: targetUserId
+                }
+              }
+            ),
+            prisma.notification.create(
+              {
+                data: {
+                  type:"FOLLOW",
+                  userId: targetUserId,
+                  creatorId: userId
+                }
+              }
+            )
+          ]
+
+        )
+
+        return {
+          success: true
+        }
+      }
+  } catch (error) {
+    console.log("Error in toggle follow", error);
+    return {
+      success: false,
+      error: "Error toggling follow"
+    }
+  }
+}

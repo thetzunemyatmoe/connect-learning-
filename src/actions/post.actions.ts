@@ -212,3 +212,38 @@ export async function toggleComment(postId: string, content: string) {
   }
 }
 
+export async function toggleDelete(postId: string) {
+  try {
+    const userId = await getDbUserId();
+
+    if(!userId) return;
+
+    const post = await prisma.post.findUnique(
+      {
+        where: {id: postId },
+        select: { authorId: true }
+      }
+    );
+
+    if (!post) throw new Error("Post not found");
+
+    if (post.authorId !== userId) throw new Error("Unauthorized - no delete permission");
+
+    await prisma.post.delete({
+      where: { id: postId }
+    });
+    revalidatePath("/");
+
+    return {
+      success: true
+    }
+  } catch (error) {
+    console.error(error);
+    return {
+      success: false,
+      error: "Failed to delete post"
+    }
+
+  }
+}
+

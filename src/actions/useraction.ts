@@ -62,7 +62,7 @@ export async function getUserByClerkId(clerkId:string) {
 export async function getDbUserId() {
   const { userId:clerkId } = await auth();
 
-  if (!clerkId) throw new Error("Unauthorized");
+  if (!clerkId) return null;
 
   const user = await getUserByClerkId(clerkId);
 
@@ -77,6 +77,7 @@ export async function getRandomUsers() {
     const userId = await getDbUserId()
 
     // GET THREE RANDOM USERS (EXCLUDE OURSELF and ALREADY FOLLOWED USERS)
+    if (!userId) return [];
 
     const randomUsers = await prisma.user.findMany({
       where: {
@@ -124,9 +125,12 @@ export async function toggleFollow(targetUserId: string) {
   try {
     const userId = await getDbUserId();
 
-    console.log("hello")
-    console.log(userId)
-    console.log(targetUserId)
+    if (!userId) {
+      return;
+    }
+
+    
+
 
     if (userId === targetUserId) {
       return {
@@ -177,12 +181,11 @@ export async function toggleFollow(targetUserId: string) {
             )
           ]
 
-        )
-
-        return {
+        ) 
+      }
+      return {
           success: true
         }
-      }
   } catch (error) {
     console.log("Error in toggle follow", error);
     return {

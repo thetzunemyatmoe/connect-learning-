@@ -14,14 +14,18 @@ const FollowButton = ({ userId }: { userId: string }) => {
   const handleFollow = async() => {
 
     setIsLoading(true);
-    const result = await toggleFollow(userId);
-    if (!result?.success) {
-      toast.error(result?.error ?? "Error following the account");
-      setIsLoading(false);
-      return;
+
+    try {
+      const result = await toggleFollow(userId);
+    if (!result.success) {
+      toast.error(result.error ?? "Error following the account");
+      return
     }
     toast.success("Account followed.");
+    } finally {
     setIsLoading(false);
+  }
+    
   }
   return (
     <Button

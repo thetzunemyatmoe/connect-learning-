@@ -1,3 +1,4 @@
+import { toggleFollow } from '@/actions/useraction';
 "use server"
 
 import { prisma } from "@/lib/prisma";
@@ -34,7 +35,6 @@ export async function createPost(content: string, image: string) {
 }
 
 export async function getPosts() {
-
   try {
     const posts = await prisma.post.findMany(
       {
@@ -84,5 +84,71 @@ export async function getPosts() {
     console.log("Error in fetching posts", error)
     throw new Error("Fail to fetch post")
   }
+}
+
+export async function toggleLike(postId: string) {
+
+  try {
+    const userId = await getDbUserId();
+
+    if (!userId) return;
+
+    const existingLike = await prisma.like.findUnique({
+      where: {
+        userId_postId: {
+          userId,
+          postId
+        }
+      }
+    });
+
+    const post = await prisma.post.findUnique({
+      where: { id: postId },
+      select: { authorId: true }
+    });
+
+    if (!post) throw new Error("Post not found");
+
+    if(existingLike) {
+      await prisma.like.delete({
+        where: {
+         userId_postId: {
+          userId,
+          postId
+         } 
+        }
+      })
+    } else {
+      await prisma.$transaction(
+        [
+          prisma.like.create(
+            {
+              data: {
+                userId,
+                postId
+              }
+            }),
+          ...(post.authorId !== userId ? [
+            prisma.notification.create({
+              data: {
+                type: "LIKE",
+                userId: post.authorId,
+                creatorId: userId,
+                postId
+              }
+            }),
+          ] : [])
+        ]);
+    }
+
+    revalidatePath("/");
+    return { success: true};
+
+
+  } catch (error) {
+    console.error("Failed to toggle like: ", error);
+    return { succes: false, error: "Failed to toggle like"};
+  }
   
 }
+

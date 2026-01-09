@@ -1,4 +1,3 @@
-import { prisma } from './../lib/prisma';
 import { toggleFollow } from '@/actions/useraction';
 "use server"
 
@@ -45,6 +44,7 @@ export async function getPosts() {
         include: {
           author: {
             select: {
+              id: true,
               name: true,
               image: true,
               username: true
@@ -154,7 +154,7 @@ export async function toggleLike(postId: string) {
 }
 
 
-export async function toggleComment(postId: string, content: string) {
+export async function createComment(postId: string, content: string) {
   try {
     const userId = await getDbUserId();
 
@@ -212,7 +212,7 @@ export async function toggleComment(postId: string, content: string) {
   }
 }
 
-export async function toggleDelete(postId: string) {
+export async function deletePost(postId: string) {
   try {
     const userId = await getDbUserId();
 

@@ -183,8 +183,8 @@ export async function updateProfile(formData: FormData) {
 
 export async function isFollowing(userId: string) {
   try {
-    const currentUserId = await getDbUserId();
 
+    const currentUserId = await getDbUserId();
     if(!currentUserId) return false;
 
     const follow = await prisma.follows.findUniqueOrThrow({

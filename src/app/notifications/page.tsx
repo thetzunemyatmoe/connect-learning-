@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarImage } from '@radix-ui/react-avatar';
 import { formatDistanceToNow } from 'date-fns';
+import { HeartIcon, MessageCircleIcon, UserPlusIcon } from 'lucide-react';
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast';
 

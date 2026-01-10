@@ -2,6 +2,7 @@ import { getProfileByUsername, getUserLikedPosts, getUserPosts, isFollowing } fr
 import { notFound } from 'next/navigation';
 import { title } from 'process';
 import React from 'react'
+import ProfilePageClient from './ProfilePageClient ';
 
 export async function generateMetadata({params}: { params : { username: string }}) {
 
@@ -25,7 +26,7 @@ const ProfilePage = async ({params} : { params: { username: string } }) => {
     isFollowing(user.id),
   ]);
   return (
-    <ProfilePageClient 
+    <ProfilePageClient
       user={user}
       posts={posts}
       likedPosts={likedPosts}

@@ -112,7 +112,7 @@ const ProfilePageClient = ({user, posts, likedPosts, isFollowing: initialFollowi
                     </div>
                   </div>
                 </div>
-
+                
                 {/* "FOLLOW & EDIT PROFILE" BUTTONS */}
                 {!currentUser ? (
                   <SignInButton mode="modal">

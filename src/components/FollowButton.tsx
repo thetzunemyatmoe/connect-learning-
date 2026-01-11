@@ -17,8 +17,8 @@ const FollowButton = ({ userId }: { userId: string }) => {
 
     try {
       const result = await toggleFollow(userId);
-    if (!result.success) {
-      toast.error(result.error ?? "Error following the account");
+    if (!result?.success) {
+      toast.error(result?.error ?? "Error following the account");
       return
     }
     toast.success("Account followed.");
